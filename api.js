@@ -40,29 +40,34 @@ router.get('/users', function(req, res) {
 
 router.post('/authenticate', function(req, res) {
     User.findOne({
-        name: req.body.name
+        username: req.body.username
     }, function(err, user) {
         if (err) throw err;
 
         if (!user) {
             res.json({ success: false, message: 'Authentication failed. User not found.' });
         } else if (user) {
-            if (user.password != req.body.password) {
-                res.json({ success: false, message: 'Authentication failed. Wrong password.'  });
-            } else {
-                var cert = fs.readFileSync(process.env.NODE_JWT_KEY);
-                // if user is found and password matches, create a token
-                var token = jwt.sign(user, cert,  {
-                    algorithm: 'RS256',
-                    expiresInMinutes: 1440 // 24 hours
-                });
+            user.comparePassword(req.body.password, function(err, isMatch) {
+                if (err) throw err;
 
-                res.json({
-                    success: true,
-                    message: 'Here is your token',
-                    token: token
-                });
-            }
+                if (isMatch) {
+                    var cert = fs.readFileSync(process.env.NODE_JWT_KEY);
+                    // if user is found and password matches, create a token
+                    var token = jwt.sign(user, cert,  {
+                        algorithm: 'RS256',
+                        expiresInMinutes: 1440 // 24 hours
+                    });
+
+                    res.json({
+                        success: true,
+                        message: 'Here is your token',
+                        token: token
+                    });
+
+                } else {
+                    res.json({ success: false, message: 'Authentication failed. Wrong password.'  });
+                }
+            });
         }
     });
 });
