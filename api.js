@@ -21,24 +21,6 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-router.post('/users', function(req, res) {
-    var user = new User(req.body);
-    user.save(function(err) {
-        if (err) throw err;
-
-        console.log('User saved successfully');
-        res.send({ success: true });
-    });
-});
-
-router.get('/users', function(req, res) {
-    User.find(function(err, users) {
-        if (err) throw err;
-
-        res.json(users);
-    });
-});
-
 router.post('/authenticate', function(req, res) {
     User.findOne({
         username: req.body.username
@@ -83,6 +65,7 @@ router.use(function(req, res, next) {
                 return res.json({ success: false, message: 'Failed to authenticate token' });
             } else {
                 req.decoded = decoded;
+                app.set('user', decoded);
                 app.set('username', decoded.username);
                 next();
             }
@@ -93,6 +76,24 @@ router.use(function(req, res, next) {
             message: 'No token provided.'
         });
     }
+});
+
+router.post('/users', function(req, res) {
+    var user = new User(req.body);
+    user.save(function(err) {
+        if (err) throw err;
+
+        console.log('User saved successfully');
+        res.send({ success: true });
+    });
+});
+
+router.get('/users', function(req, res) {
+    User.find(function(err, users) {
+        if (err) throw err;
+
+        res.json(users);
+    });
 });
 
 router.get('/samples', function(req, res) {
@@ -106,7 +107,10 @@ router.get('/samples', function(req, res) {
 });
 
 router.post('/samples', function(req, res) {
+    var user = app.get('user');
     var sample = new Sample(req.body);
+    sample._creator = user; 
+
     sample.save(function(err) {
         if (err) {
             res.send(err);

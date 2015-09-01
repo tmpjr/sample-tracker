@@ -9,6 +9,7 @@ var sampleSchema = new Schema({
     },
     type: String,
     collected_at: Date,
+    _creator: { type: Object, ref: 'User' },
     created_at: Date,
     updated_at: Date
 });
