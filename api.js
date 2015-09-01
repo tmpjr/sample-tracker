@@ -14,7 +14,8 @@ var User = require('./models/user');
 
 mongoose.connect(config.database);
 
-app.set('api', process.env.NODE_API_SECRET);
+app.set('jwt_public_cert', fs.readFileSync(process.env.NODE_KEYS_PATH + '/jwt-public.pem'));
+app.set('jwt_private_cert', fs.readFileSync(process.env.NODE_KEYS_PATH + '/jwt-private.pem'));
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
@@ -51,7 +52,7 @@ router.post('/authenticate', function(req, res) {
                 if (err) throw err;
 
                 if (isMatch) {
-                    var cert = fs.readFileSync(process.env.NODE_JWT_KEY);
+                    var cert = app.get('jwt_private_cert');
                     // if user is found and password matches, create a token
                     var token = jwt.sign(user, cert,  {
                         algorithm: 'RS256',
@@ -76,7 +77,8 @@ router.use(function(req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
     if (token) {
-        jwt.verify(token, app.get('apiSecret'), function(err, decoded) {
+        var cert = app.get('jwt_public_cert');
+        jwt.verify(token, cert, function(err, decoded) {
             if (err) {
                 return res.json({ success: false, message: 'Failed to authenticate token' });
             } else {

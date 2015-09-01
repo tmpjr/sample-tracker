@@ -2,9 +2,13 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var sampleSchema = new Schema({
-    barcode: String,
+    barcode: {
+        type: String,
+        required: true,
+        index: { unique: true }
+    },
     type: String,
-    collected: Date,
+    collected_at: Date,
     created_at: Date,
     updated_at: Date
 });
