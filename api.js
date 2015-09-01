@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var morgan = require('morgan');
 var jwt = require('jsonwebtoken');
+var fs = require('fs');
 
 var app = express();
 var router = express.Router();
@@ -13,11 +14,29 @@ var User = require('./models/user');
 
 mongoose.connect(config.database);
 
-app.set('apiSecret', process.env.NODE_API_SECRET);
-app.set('username', null);
+app.set('api', process.env.NODE_API_SECRET);
+
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+router.post('/users', function(req, res) {
+    var user = new User(req.body);
+    user.save(function(err) {
+        if (err) throw err;
+
+        console.log('User saved successfully');
+        res.send({ success: true });
+    });
+});
+
+router.get('/users', function(req, res) {
+    User.find(function(err, users) {
+        if (err) throw err;
+
+        res.json(users);
+    });
+});
 
 router.post('/authenticate', function(req, res) {
     User.findOne({
@@ -31,8 +50,10 @@ router.post('/authenticate', function(req, res) {
             if (user.password != req.body.password) {
                 res.json({ success: false, message: 'Authentication failed. Wrong password.'  });
             } else {
+                var cert = fs.readFileSync(process.env.NODE_JWT_KEY);
                 // if user is found and password matches, create a token
-                var token = jwt.sign(user, app.get('apiSecret'), {
+                var token = jwt.sign(user, cert,  {
+                    algorithm: 'RS256',
                     expiresInMinutes: 1440 // 24 hours
                 });
 
@@ -65,25 +86,6 @@ router.use(function(req, res, next) {
             message: 'No token provided.'
         });
     }
-});
-
-router.post('/users', function(req, res) {
-    var user = new User(req.body);
-    user.save(function(err) {
-        if (err) throw err;
-
-        console.log('User saved successfully');
-        res.send({ success: true });
-    });
-});
-
-router.get('/users', function(req, res) {
-    User.find(function(err, users) {
-        if (err) throw err;
-
-        console.log(app.get('username'));
-        res.json(users);
-    });
 });
 
 router.get('/samples', function(req, res) {
