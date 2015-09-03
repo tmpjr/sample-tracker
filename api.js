@@ -10,6 +10,7 @@ var router = express.Router();
 
 var config = require('./config');
 var Sample = require('./models/sample');
+var Container = require('./models/container');
 var User = require('./models/user');
 
 mongoose.connect(config.database);
@@ -96,6 +97,27 @@ router.get('/users', function(req, res) {
     });
 });
 
+router.post('/containers', function(req, res) {
+    var container = new Container(req.body);
+    container.save(function(err) {
+        if (err) {
+            res.send(err);
+        }
+
+        res.send({message: 'Container added'});
+    });
+});
+
+router.get('/containers', function(req, res) {
+    Container.find(function(err, contaienrs) {
+        if (err) {
+            res.send(err);
+        }
+
+        res.json(containers);
+    });
+});
+
 router.get('/samples', function(req, res) {
     Sample.find(function(err, samples) {
         if (err) {
@@ -109,7 +131,7 @@ router.get('/samples', function(req, res) {
 router.post('/samples', function(req, res) {
     var user = app.get('user');
     var sample = new Sample(req.body);
-    sample._creator = user; 
+    sample._created_by = user; 
 
     sample.save(function(err) {
         if (err) {
@@ -129,6 +151,9 @@ router.put('/samples/:id', function(req, res) {
         for (prop in req.body) {
             sample[prop] = req.body[prop];
         }
+
+        var user = app.get('user');
+        sample._updated_by = user; 
 
         sample.save(function(err) {
             if (err) {

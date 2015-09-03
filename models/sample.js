@@ -8,8 +8,13 @@ var sampleSchema = new Schema({
         index: { unique: true }
     },
     type: String,
+    _location: {
+        container: {type Object, ref: 'Container' },
+        cell: Number
+    },
     collected_at: Date,
-    _creator: { type: Object, ref: 'User' },
+    _created_by: { type: Object, ref: 'User' },
+    _updated_by: { type: Object, ref: 'User' },
     created_at: Date,
     updated_at: Date
 });
