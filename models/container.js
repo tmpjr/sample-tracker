@@ -2,22 +2,22 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var containerSchema = new Schema({
-    name: {
-        type: String,
-        required: true,
-        index: { unique: true }
-    },
     barcode: {
         type: String,
         required: true,
         index: { unique: true }
     },
-    cols: {
-        type: Number,
+    desc: {
+        type: String,
         required: true
     },
-    rows: {
-        type: Number,
-        required: true
-    }
+    size: {
+        rows: Number,
+        cols: Number
+    },
+    samples: [{
+        type: Schema.ObjectId, ref: 'Sample'
+    }]
 });
+
+module.exports = mongoose.model('Container', containerSchema);

@@ -9,6 +9,7 @@ var app = express();
 var router = express.Router();
 
 var config = require('./config');
+
 var Sample = require('./models/sample');
 var Container = require('./models/container');
 var User = require('./models/user');
@@ -109,7 +110,7 @@ router.post('/containers', function(req, res) {
 });
 
 router.get('/containers', function(req, res) {
-    Container.find(function(err, contaienrs) {
+    Container.find(function(err, containers) {
         if (err) {
             res.send(err);
         }
