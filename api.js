@@ -110,17 +110,35 @@ router.post('/containers', function(req, res) {
 });
 
 router.get('/containers', function(req, res) {
-    Container.find(function(err, containers) {
+    Container
+    .find()
+    .populate('samples')
+    .exec(function(err, container) {
         if (err) {
             res.send(err);
         }
 
-        res.json(containers);
+        res.json(container);
+    });
+});
+
+router.put('/containers/:id', function(req, res) {
+    var id = req.params.id;
+    var body = req.body;
+
+    Container
+    .findByIdAndUpdate(id, body, { "new": true }, function(err, container) {
+        if (err) throw err;
+
+        res.json(container);
     });
 });
 
 router.get('/samples', function(req, res) {
-    Sample.find(function(err, samples) {
+    Sample
+    .find()
+    .populate('_created_by _updated_by')
+    .exec(function(err, samples) {
         if (err) {
             res.send(err);
         }
@@ -139,30 +157,19 @@ router.post('/samples', function(req, res) {
             res.send(err);
         }
 
-        res.send({message: 'Sample added'});
+        res.json({message: 'Sample added'});
     });
 });
 
 router.put('/samples/:id', function(req, res) {
-    Sample.findOne({ _id:req.params.id }, function(err, sample) {
-        if (err) {
-            res.send(err);
-        } 
+    var id = req.params.id;
+    var body = req.body;
+    body._updated_by = app.get('user');
 
-        for (prop in req.body) {
-            sample[prop] = req.body[prop];
-        }
-
-        var user = app.get('user');
-        sample._updated_by = user; 
-
-        sample.save(function(err) {
-            if (err) {
-                res.send(err);
-            }
-
-            res.send(sample);
-        });
+    Sample
+    .findByIdAndUpdate(id, body, { "new": true }, function(err, sample) {
+        if (err) throw err;
+        res.json(sample);
     });
 });
     

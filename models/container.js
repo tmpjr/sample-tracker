@@ -15,9 +15,7 @@ var containerSchema = new Schema({
         rows: Number,
         cols: Number
     },
-    samples: [{
-        type: Schema.ObjectId, ref: 'Sample'
-    }]
+    samples: [{ type: Schema.ObjectId, ref: 'Sample' }]
 });
 
 module.exports = mongoose.model('Container', containerSchema);
