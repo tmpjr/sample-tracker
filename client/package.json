@@ -1,0 +1,25 @@
+{
+  "name": "sample-tracker-client",
+  "version": "1.0.0",
+  "description": "Client for Sample Tracker",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tmpjr/sample-tracker.git"
+  },
+  "keywords": [
+    "express",
+    "mongodb",
+    "nodejs",
+    "rest"
+  ],
+  "author": "tploskinajr@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tmpjr/sample-tracker/issues"
+  },
+  "homepage": "https://github.com/tmpjr/sample-tracker#readme"
+}
