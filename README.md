@@ -1,5 +1,5 @@
 # sample-tracker
-Small LIMS project to demonstrate usage of Node, Express, REST, MongoDb, Mongoose, JWT. An accompanying front-end application will be developed in pararllel. This is a small side project I intend to complete and host.
+A small project to demonstrate the use of NodeJS authentication with JWT and MongodDb.
 
 ### Installation
 ```
